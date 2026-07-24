@@ -13,6 +13,8 @@ from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     ContextTypes,
+    MessageHandler,
+    filters,
 )
 
 from dotenv import load_dotenv
@@ -84,6 +86,24 @@ recipes = [
         "recipe": "Смажь лаваш кетчупом, добавь начинку и запеки 10 минут."
     },
 ]
+
+my_name = "Костюнин Валерий"
+my_age = 14
+my_hobby = "играть в видео игры"
+fact1 = "Я умею играть на гитаре"
+fact2 = "Моя любимая видеоигра это Dota 2."
+final_fact = "Я увлекаюсь техникой"
+async def about(update, context):
+    text = (
+        f"Меня зовут {my_name}\n"
+        f"Мне {my_age} лет\n"
+        f"Мое хобби {my_hobby}\n"
+        f"Первый факт обо мне {fact1}\n"
+        f"Второй факт обо мне {fact2}\n"
+        f"Последний факт обо мне {final_fact}\n"
+        f"Этот бот работает 24/7 на pythonanywhere\n"
+    )
+    await update.message.reply_text(text)
 
 # ==========================
 # КЛАВИАТУРА
@@ -158,20 +178,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML"
         )
 
-    # О боте
-    elif query.data == "about":
-        await query.edit_message_text(
-            "ℹ️ <b>О боте</b>\n\n"
-            "Этот бот написан на Python ❤️\n\n"
-            "Возможности:\n"
-            "• 💡 Совет дня\n"
-            "• 🍳 Случайный рецепт\n\n"
-            "Автор: Valera",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🏠 Назад", callback_data="menu")]
-            ]),
-            parse_mode="HTML"
-        )
+
 
     # Главное меню
     elif query.data == "menu":
@@ -181,6 +188,50 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=main_keyboard(),
             parse_mode="HTML"
         )
+games = {}
+async def start_easy_game(update,context):
+    user_id = update.effective_user.id
+    secret_number = random.randint(1,10)
+    games[user_id] = secret_number
+
+    await update.message.reply_text("Я загадал число от 1 до 10. Попробуй угадать :)")
+
+async def handle_guess(update, context):
+    user_id = update.effective_user.id
+
+    if user_id not in games:
+        return
+    text = update.message.text
+
+    if not text.isdigit():
+        await update.message.reply_text("Это не число, иди попробуй сново.")
+        return
+
+    guess = int(text)
+    secret_number = games[user_id]
+    if guess < secret_number:
+        await update.message.reply_text("Больше!")
+    elif guess > secret_number:
+        await update.message.reply_text("Меньше!")
+    else:
+        await update.message.reply_text("Поздравляю, ты угадал число!")
+
+
+async def start_medium_game(update,context):
+    user_id = update.effective_user.id
+    secret_number = random.randint(1,100)
+    games[user_id] = secret_number
+
+    await update.message.reply_text("Я загадал число от 1 до 100. Попробуй угадать :)")
+
+async def start_hard_game(update,context):
+    user_id = update.effective_user.id
+    secret_number = random.randint(1,1000)
+    games[user_id] = secret_number
+
+    await update.message.reply_text("Я загадал число от 1 до 1000. Попробуй угадать :)")
+
+
 # ==========================
 # ЗАПУСК БОТА
 # ==========================
@@ -190,10 +241,13 @@ def main():
 
     # Команды
     app.add_handler(CommandHandler("start", start))
-
+    app.add_handler(CommandHandler("about",about))
+    app.add_handler(CommandHandler("start_easy_game",start_easy_game))
+    app.add_handler(CommandHandler("start_medium_game",start_medium_game))
+    app.add_handler(CommandHandler("start_hard_game",start_hard_game))
     # Обработка Inline-кнопок
     app.add_handler(CallbackQueryHandler(buttons))
-
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_guess))
     print("✅ Бот успешно запущен!")
 
     app.run_polling()
