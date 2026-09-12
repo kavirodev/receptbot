@@ -1,3 +1,5 @@
+# nix-shell -p python314Packages.python-dotenv python314Packages.python-telegram-bot (Для запуска бота в nix-shell)
+
 import random
 from dotenv import load_dotenv
 import os
@@ -21,15 +23,13 @@ from telegram.ext import (
 from dotenv import load_dotenv
 import os
 
-# ==========================
-# ВСТАВЬ СЮДА СВОЙ ТОКЕН
-# ==========================
+# Загрузка токена из файла .env, которые я написал САМ.
 
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 
-# Снизу идет список советов.
+# Снизу идет список советов, написаные искуственным интелектом.
 
 tips = [
     "💧 Пей больше воды.",
@@ -49,7 +49,7 @@ tips = [
     "✨ Верь в себя!"
 ]
 
-# Теперь тут идут рецепты.
+# Теперь тут идут рецепты, написаные искуственным интелектом.
 
 recipes = [
     {
@@ -93,9 +93,8 @@ def main_keyboard():
         [InlineKeyboardButton("ℹ️ О боте", callback_data="about")],
         [InlineKeyboardButton("🎮 Угадай число", callback_data="game")],
     ])
-# ==========================
-# /start
-# ==========================
+
+# Запуск бота через /start, проверка на регистрацию пользователя, и если нет добавление его в базу данных, если пользователь был зарегистрирован выводится главное меню
 
 USERS_FILE = "users.json"
 
@@ -139,15 +138,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=main_keyboard()
         )
     
-# ==========================
-# ОБРАБОТКА КНОПОК
-# ==========================
+
+# Обработка нажатий на Inline-кнопки.
+
 
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    # Совет дня
+# Совет дня
     if query.data == "tip":
         tip = random.choice(tips)
 
@@ -160,7 +159,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML"
         )
 
-    # Рецепт
+# Вывод случайного рецепта.
     elif query.data == "recipe":
         recipe = random.choice(recipes)
 
@@ -181,7 +180,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML"
         )
 
-       # Тут идут факты о создателе бота, и функция которая их выводит пользователю в телеграм. 
+# Тут идут факты о создателе бота, и функция которая их выводит пользователю в телеграм. 
     elif query.data == "about":
         await query.edit_message_text(
             "<b>О боте</b>\n\n"
@@ -192,7 +191,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]),
             parse_mode="HTML"
         )
-
+# Снизу написано что будет если пользователь нажмет на кнопку угадай число, и прочие кнопки.
     elif query.data == "game":
         await query.edit_message_text(
     "Угадай число\n\n"
@@ -209,7 +208,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]),
 )
 
-        # Таблица лидеров
+# Таблица лидеров
     elif query.data == "leaderboard":
         users = load_users()
 
@@ -259,7 +258,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await query.edit_message_text("Я загадал число от 1 до 1000. Попробуй угадать")
 
-    # Главное меню
+# Главное меню
     elif query.data == "menu":
         await query.edit_message_text(
             "👋 <b>Главное меню</b>\n\n"
@@ -267,6 +266,8 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=main_keyboard(),
             parse_mode="HTML"
         )
+# Работа мини-игры угадай число, и обработка ввода пользователя в телеграм. 
+
 games = {}
 games_scores = {}
 async def start_easy_game(update,context):
@@ -319,19 +320,13 @@ async def start_hard_game(update,context):
 
     await update.message.reply_text("Я загадал число от 1 до 1000. Попробуй угадать :)")
 
-
-# ==========================
-# ЗАПУСК БОТА
-# ==========================
+# Запуск бота и добавление команд, обработчиков кнопок и сообщений
 
 def main():
     app = Application.builder().token(TOKEN).build()
 
     # Команды
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("start_easy_game",start_easy_game))
-    app.add_handler(CommandHandler("start_medium_game",start_medium_game))
-    app.add_handler(CommandHandler("start_hard_game",start_hard_game))
     # Обработка Inline-кнопок
     app.add_handler(CallbackQueryHandler(buttons))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_guess))
