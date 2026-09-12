@@ -84,7 +84,7 @@ recipes = [
     },
 ]
 
-# Снизу находятся функции для создания клавиатуры и обработки команд кнопок.
+# Снизу находятся функции для создания клавиатуры и обработки команд кнопок, изначально они были написаны ИИ, но потом я их переделал.
 
 def main_keyboard():
     return InlineKeyboardMarkup([
@@ -139,7 +139,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     
 
-# Обработка нажатий на Inline-кнопки.
+# Обработка нажатий на Inline-кнопки, написаные 50/50 ИИ и мной.
 
 
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -159,7 +159,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML"
         )
 
-# Вывод случайного рецепта.
+# Вывод случайного рецепта, написонный мной.
     elif query.data == "recipe":
         recipe = random.choice(recipes)
 
@@ -180,7 +180,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode="HTML"
         )
 
-# Тут идут факты о создателе бота, и функция которая их выводит пользователю в телеграм. 
+# Тут идут факты о создателе бота, и функция которая их выводит пользователю в телеграм, так же написаная мной.
     elif query.data == "about":
         await query.edit_message_text(
             "<b>О боте</b>\n\n"
@@ -191,7 +191,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]),
             parse_mode="HTML"
         )
-# Снизу написано что будет если пользователь нажмет на кнопку угадай число, и прочие кнопки.
+# Снизу написано что будет если пользователь нажмет на кнопку угадай число, и прочие кнопки, написаные мной.
     elif query.data == "game":
         await query.edit_message_text(
     "Угадай число\n\n"
@@ -208,7 +208,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]),
 )
 
-# Таблица лидеров
+# Таблица лидеров написаная мной, но я использовал ИИ для сортировки пользователей по очкам, и вывода их в телеграм.
     elif query.data == "leaderboard":
         users = load_users()
 
@@ -266,7 +266,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=main_keyboard(),
             parse_mode="HTML"
         )
-# Работа мини-игры угадай число, и обработка ввода пользователя в телеграм. 
+# Работа мини-игры угадай число, и обработка ввода пользователя в телеграм, написаная мной.
 
 games = {}
 games_scores = {}
@@ -320,12 +320,12 @@ async def start_hard_game(update,context):
 
     await update.message.reply_text("Я загадал число от 1 до 1000. Попробуй угадать :)")
 
-# Запуск бота и добавление команд, обработчиков кнопок и сообщений
+# Запуск бота и добавление команд, обработчиков кнопок и сообщений написаная ИИ.
 
 def main():
     app = Application.builder().token(TOKEN).build()
 
-    # Команды
+    # Команды, пока-что только /start.
     app.add_handler(CommandHandler("start", start))
     # Обработка Inline-кнопок
     app.add_handler(CallbackQueryHandler(buttons))
@@ -333,7 +333,6 @@ def main():
     print("✅ Бот успешно запущен!")
 
     app.run_polling()
-
 
 if __name__ == "__main__":
     main()
